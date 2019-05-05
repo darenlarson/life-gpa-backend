@@ -33,17 +33,17 @@ router.get("/:userId/habit-records", (req, res) => {
   const { userId } = req.params;
 
   db("habit_tracker")
-    .where({user_id: userId})
+    .where({ user_id: userId })
     .then(habitRecords => {
-      console.log(habitRecords);
+      // console.log(habitRecords);
       res.status(200).json(habitRecords);
     })
     .catch(err => {
       res.status(500).json(err);
-    })
+    });
 });
 
-// get all habits for a specific user, combine complextion %
+// get all habits for a specific user, combine completion %
 // router.get("/:userId/user-habits", (req, res) => {
 //   const { userId } = req.params;
 
@@ -92,9 +92,35 @@ router.post("/:userId/user-habits", (req, res) => {
     });
 });
 
+// delete a habit
+router.delete(`/:habitId`, (req, res) => {
+  const { habitId } = req.params;
+
+  db("habits")
+    .where({ id: habitId })
+    .del()
+    .then(() => {
+      console.log("habitId:", habitId);
+      db("habit_tracker")
+        .where({ habit_id: habitId })
+        .del()
+        .then(() => {
+          res.status(200).json({ message: "Habit data deleted" });
+        })
+        .catch(err => {
+          console.log(err);
+          res.status(404).json({ message: "Habit records not found", error: err })
+        })
+    })
+    .catch(err => {
+      console.log(err);
+      res.status(404).json({ message: "Habit not found", error: err });
+    });
+});
+
 // complete a habit
 router.post("/complete-habit", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   const {
     id,
     user_id,
@@ -104,8 +130,8 @@ router.post("/complete-habit", (req, res) => {
     yesterday
   } = req.body;
 
-  console.log("last_completed", last_completed);
-  console.log("today", today);
+  // console.log("last_completed", last_completed);
+  // console.log("today", today);
 
   db("habits")
     .where("id", id)
@@ -127,7 +153,7 @@ router.post("/complete-habit", (req, res) => {
               });
           })
           .catch(err => {
-            console.log(err);
+            // console.log(err);
             res.status(500).json({ message: "Error. Something happened" });
           });
       } else {
@@ -167,6 +193,29 @@ router.delete("/complete-habit", (req, res) => {
     })
     .catch(err => {
       res.status(500).json({ error: "Delete request failed" });
+    });
+});
+
+// Reset habit data
+router.put("/reset-habit", (req, res) => {
+  const { date_created, id } = req.body;
+
+  db("habits")
+    .where({ id: id })
+    .update({ date_created: date_created, last_completed: null })
+    .then(() => {
+      db("habit_tracker")
+        .where({ habit_id: id })
+        .del()
+        .then(count => {
+          res.status(200).json({ count: count });
+        })
+        .catch(err => {
+          res.status(404).json({ error: err });
+        });
+    })
+    .catch(err => {
+      res.status(500).json({ error: "Update request failed" });
     });
 });
 
