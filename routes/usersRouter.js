@@ -6,7 +6,7 @@ const db = require('../database/dbConfig')
 const bcrypt = require('bcryptjs');
 
 
-const { authenticate, generateToken } = require('../auth/authenticate');
+const { generateToken } = require('../auth/authenticate');
 
 router.post('/register', (req, res) => {
     console.log(req.body)

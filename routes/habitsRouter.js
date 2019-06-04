@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const db = require("../database/dbConfig");
 const habitsHelper = require("../models/habits-model");
+const { authenticate } = require('../auth/authenticate');
 
 // get all habits for all users
 router.get("/all-habits", (req, res) => {
@@ -15,7 +16,7 @@ router.get("/all-habits", (req, res) => {
 });
 
 // get all habits for a specific user
-router.get("/:userId/user-habits", (req, res) => {
+router.get("/:userId/user-habits", authenticate, (req, res) => {
   const { userId } = req.params;
 
   db("habits")
