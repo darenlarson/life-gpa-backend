@@ -30,7 +30,7 @@ router.get("/:userId/user-habits", authenticate, (req, res) => {
 });
 
 // get habit records for all habits for a user
-router.get("/:userId/habit-records", (req, res) => {
+router.get("/:userId/habit-records", authenticate, (req, res) => {
   const { userId } = req.params;
 
   db("habit_tracker")
@@ -59,7 +59,7 @@ router.get("/:userId/habit-records", (req, res) => {
 // });
 
 // Return habit completion information
-router.get("/:userId/habit-completion-info", (req, res) => {
+router.get("/:userId/habit-completion-info", authenticate, (req, res) => {
   const { userId } = req.params;
   const { habitId } = req.body;
 
@@ -72,7 +72,7 @@ router.get("/:userId/habit-completion-info", (req, res) => {
 });
 
 // add a habit
-router.post("/:userId/user-habits", (req, res) => {
+router.post("/:userId/user-habits", authenticate, (req, res) => {
   const { userId } = req.params;
   const { habit, date_created } = req.body;
 
@@ -94,7 +94,7 @@ router.post("/:userId/user-habits", (req, res) => {
 });
 
 // delete a habit
-router.delete(`/:habitId`, (req, res) => {
+router.delete(`/:habitId`, authenticate, (req, res) => {
   const { habitId } = req.params;
 
   db("habits")
@@ -120,7 +120,7 @@ router.delete(`/:habitId`, (req, res) => {
 });
 
 // complete a habit
-router.post("/complete-habit", (req, res) => {
+router.post("/complete-habit", authenticate, (req, res) => {
   // console.log(req.body);
   const {
     id,
@@ -183,7 +183,7 @@ router.post("/complete-habit", (req, res) => {
 });
 
 // undo a completed habit
-router.delete("/complete-habit", (req, res) => {
+router.delete("/complete-habit", authenticate, (req, res) => {
   const { userId, habitId, todayDate } = req.body;
 
   db("habit_tracker")
@@ -198,7 +198,7 @@ router.delete("/complete-habit", (req, res) => {
 });
 
 // Reset habit data
-router.put("/reset-habit", (req, res) => {
+router.put("/reset-habit", authenticate, (req, res) => {
   const { date_created, id } = req.body;
 
   db("habits")
