@@ -1,19 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../database/dbConfig");
-const habitsHelper = require("../models/habits-model");
-const { authenticate } = require('../auth/authenticate');
-
-// get all habits for all users
-router.get("/all-habits", (req, res) => {
-  db("habits")
-    .then(habits => {
-      res.status(200).json(habits);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
-});
+const { authenticate } = require("../auth/authenticate");
+const { calcTotalLifeGPA, allCompleteCheck, combineHabitData } = require("./habitsHelper");
 
 // get all habits for a specific user
 router.get("/:userId/user-habits", authenticate, (req, res) => {
@@ -22,53 +11,22 @@ router.get("/:userId/user-habits", authenticate, (req, res) => {
   db("habits")
     .where({ user_id: userId })
     .then(habits => {
-      res.status(200).json(habits);
+      db("habit_tracker")
+        .where({ user_id: userId })
+        .then(habitRecords => {
+          const finalHabits = combineHabitData(habits, habitRecords)
+          const totalLifeGPA = calcTotalLifeGPA(finalHabits);
+          const allComplete = allCompleteCheck(finalHabits);
+
+          res.status(200).json({ habits: finalHabits, lifeGPA: totalLifeGPA, allComplete: allComplete });
+        })
+        .catch(err => {
+          res.status(500).json(err);
+        });
     })
     .catch(err => {
       res.status(500).json(err);
     });
-});
-
-// get habit records for all habits for a user
-router.get("/:userId/habit-records", authenticate, (req, res) => {
-  const { userId } = req.params;
-
-  db("habit_tracker")
-    .where({ user_id: userId })
-    .then(habitRecords => {
-      // console.log(habitRecords);
-      res.status(200).json(habitRecords);
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
-});
-
-// get all habits for a specific user, combine completion %
-// router.get("/:userId/user-habits", (req, res) => {
-//   const { userId } = req.params;
-
-//   habitsHelper.getHabitsByUserId(userId)
-//     .then(habits => {
-//       console.log(habits);
-//       // res.status(200).json(habits);
-//     })
-//     .catch(err => {
-//       // res.status(500).json({ error: err, message: "Something wrong happened" });
-//     })
-// });
-
-// Return habit completion information
-router.get("/:userId/habit-completion-info", authenticate, (req, res) => {
-  const { userId } = req.params;
-  const { habitId } = req.body;
-
-  db("habit_tracker").where({ user_id: userId, habit_id: habitId });
-  then(habitRecords => {
-    res.status(200).json(habitRecords);
-  }).catch(err => {
-    res.status(500).json(err);
-  });
 });
 
 // add a habit
@@ -110,8 +68,10 @@ router.delete(`/:habitId`, authenticate, (req, res) => {
         })
         .catch(err => {
           console.log(err);
-          res.status(404).json({ message: "Habit records not found", error: err })
-        })
+          res
+            .status(404)
+            .json({ message: "Habit records not found", error: err });
+        });
     })
     .catch(err => {
       console.log(err);
