@@ -1,11 +1,7 @@
 const express = require('express');
 const router = express.Router();
-
 const Users = require('../models/users-model')
-const db = require('../database/dbConfig')
 const bcrypt = require('bcryptjs');
-
-
 const { generateToken } = require('../auth/authenticate');
 
 router.post('/register', (req, res) => {
@@ -14,10 +10,10 @@ router.post('/register', (req, res) => {
     const hash = bcrypt.hashSync(user.password, 10)
     user.password = hash;
 
-    !user.username || !user.password
-    ? res.status(400).json({ error: 'Please Provide a Username'})
-    : 
-    Users
+    if (!user.username || !user.password) {
+      res.status(400).json({ error: 'Please Provide a Username'})
+    } else {
+      Users
         .addUser(req.body)
         .then(user => {
             const token = generateToken(user);
@@ -26,6 +22,7 @@ router.post('/register', (req, res) => {
         .catch(err => {
             res.status(500).json(err)
         })
+    }
 })
 
 router.post('/login', (req, res) => {
@@ -49,7 +46,6 @@ router.post('/login', (req, res) => {
       .catch(error => {
         res.status(500).json(error);
       });
-  
   })
 
 

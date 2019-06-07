@@ -8,6 +8,7 @@ module.exports = {
   jwtKey
 };
 
+// Verify token is valid
 function authenticate(req, res, next) {
   const token = req.get('Authorization');
 
@@ -30,6 +31,7 @@ function generateToken(user) {
   
   const payload = {
     username: user.username,
+    firstName: user.first_name
   };
   
   const options = {

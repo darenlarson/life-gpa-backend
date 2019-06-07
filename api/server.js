@@ -14,8 +14,4 @@ server.use(cors());
 server.use('/api/habits', habitsRouter);
 server.use('/api/users', usersRouter);
 
-server.get('/', (req, res) => {
-  res.send('SANITY CHECK...CONFIRMED!');
-});
-
 module.exports = server;
