@@ -26,11 +26,11 @@ router.get("/:userId/user-habits", authenticate, (req, res) => {
           res.status(200).json({ habits: finalHabits, lifeGPA: totalLifeGPA, allComplete: allComplete });
         })
         .catch(err => {
-          res.status(500).json(err);
+          res.status(404).json({ err: err, message: "habit records not found" });
         });
     })
     .catch(err => {
-      res.status(500).json(err);
+      res.status(404).json({ error: err, message: "User not found" });
     });
 });
 
