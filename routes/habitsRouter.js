@@ -38,14 +38,19 @@ router.get("/:userId/user-habits", authenticate, (req, res) => {
 router.post("/:userId/user-habits", authenticate, (req, res) => {
   // Grab relevant info from req
   const { userId } = req.params;
-  const { habit, date_created } = req.body;
+  const { habitName, date_created, habitType, daysGoal, ratingGoal, countGoal, numberGoal } = req.body;
 
   // Combine provided habit data into 1 object to insert into the database
   const habitInfo = {
-    habit_name: habit,
+    habit_name: habitName,
     user_id: userId,
     date_created: date_created,
-    last_completed: null
+    last_completed: null,
+    habit_type: habitType,
+    days_per_week_goal: daysGoal,
+    ratings_goal: ratingGoal,
+    count_goal: countGoal,
+    number_goal: numberGoal
   };
 
   // Insert new habit into database
@@ -74,15 +79,13 @@ router.delete(`/:habitId`, authenticate, (req, res) => {
         .where({ habit_id: habitId })
         .del()
         .then(() => {
-          res.status(200).json({ message: "Habit data deleted" });
+          res.status(202).json({ message: "Habit data deleted" });
         })
         .catch(err => {
-          console.log(err);
           res.status(404).json({ message: "Habit records not found", error: err });
         });
     })
     .catch(err => {
-      console.log(err);
       res.status(404).json({ message: "Habit not found", error: err });
     });
 });
