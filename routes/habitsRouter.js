@@ -1,10 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../database/dbConfig");
 const { authenticate } = require("../auth/authenticate");
-const { calcTotalLifeGPA, allCompleteCheck, combineHabitData } = require("./habitsHelper");
-
-const habitsDb = require("./habitsHelperNew");
+const habitsDb = require("./habitsHelper");
 
 // get all habits for a specific user
 router.get("/:userId/user-habits", authenticate, (req, res) => {
@@ -39,10 +36,7 @@ router.post("/complete-habit", authenticate, (req, res) => {
 router.put("/reset-habit", authenticate, (req, res) => {
   habitsDb.resetHabit(req.body.id, req.body.today)
     .then(count => res.status(200).json({ count: count }))
-    .catch(err => {
-      console.log(err);
-      res.status(404).json({ error: err })
-      });
+    .catch(err => res.status(404).json({ error: err }));
 });
 
 module.exports = router;
