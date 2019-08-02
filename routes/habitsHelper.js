@@ -21,11 +21,12 @@ module.exports = {
   },
 
   completeHabit: function(habitData) {
-    const { id, user_id, habit_name, last_completed, today, yesterday } = habitData;
+    const { id, user_id, habit_name, last_completed, today, yesterday, rating, count, number } = habitData;
+    console.log(habitData);
 
     if (last_completed !== today) {
       return db("habit_tracker")
-        .insert({ habit_id: id, user_id, habit_name, date_completed: today })
+        .insert({ habit_id: id, user_id, habit_name, date_completed: today, rating: rating, count: count, number: number })
         .then(() => {
           return db("habits")
             .where("id", id)
