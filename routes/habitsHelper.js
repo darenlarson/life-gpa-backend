@@ -1,8 +1,25 @@
 const db = require("../database/dbConfig");
 
 module.exports = {
-  get: function(userId) {
-    return db("habits").where({ user_id: userId });
+  // getHabits: async function(userId) {
+  //   let habits = await db("habits").where({ user_id: userId })
+  //   let habitRecords = await db("habit_tracker").where({ user_id: userId });
+
+  //   return { habits, habitRecords: habitRecords };
+  // },
+
+  getHabits: async function(userId) {
+    let habits = await db("habits").where({ user_id: userId })
+    let habitRecords = await db("habit_tracker").where({ user_id: userId });
+
+    return habits.map(habit => {
+
+      const records = habitRecords.filter(habitRecord => {
+        return habitRecord.habit_id === habit.id;
+      })
+
+      return { ...habit, records }
+    })
   },
 
   add: function(habitData) {

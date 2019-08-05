@@ -3,11 +3,14 @@ const router = express.Router();
 const { authenticate } = require("../auth/authenticate");
 const habitsDb = require("./habitsHelper");
 
-// get all habits for a specific user
+// Get all habits for a specific user
 router.get("/:userId/user-habits", authenticate, (req, res) => {
-  habitsDb.get(req.params.userId)
-    .then(habits => res.status(200).json({ habits: habits }))
-    .catch(err => res.status(404).json({ err: err, message: "User habits not found" }));
+  habitsDb.getHabits(req.params.userId)
+    .then(habitsData => {
+      console.log(habitsData);
+      res.status(200).send(habitsData);
+    })
+    .catch(err => res.status(404).json({ err: err, message: "User's habits not found" }));
 });
 
 
