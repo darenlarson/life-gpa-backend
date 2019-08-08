@@ -7,7 +7,7 @@ const habitsDb = require("./habitsHelper");
 router.get("/:userId/user-habits", authenticate, (req, res) => {
   habitsDb.getHabits(req.params.userId)
     .then(habitsData => {
-      console.log(habitsData);
+      // console.log(habitsData);
       res.status(200).send(habitsData);
     })
     .catch(err => res.status(404).json({ err: err, message: "User's habits not found" }));

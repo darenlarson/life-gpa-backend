@@ -9,12 +9,17 @@ module.exports = {
     // Attaches record summary data to each habit
     habitsRecords.forEach(habit => {
       // If normal habit, calculate completions this week and current streak
-      if (habit.habit_type === "normal") {
-        habit.summaryData = this.normalHabitStreaks(habit);
-      }
+      if (habit.habit_type === "normal") habit.summary_data = this.normalHabitStreaks(habit);
+      if (habit.habit_type === "number") habit.summary_data = this.numberHabitSummary(habit);
     });
 
     return habitsRecords;
+  },
+
+  numberHabitSummary: function(habit) {
+    const inceptionAverage = habit.records.reduce((accumulator, currentValue) => accumulator + currentValue.number, 0) / habit.records.length;
+
+    return { inception_average: inceptionAverage };
   },
 
   // Combines all habits with each habits' records
