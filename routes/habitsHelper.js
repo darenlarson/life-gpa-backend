@@ -12,34 +12,19 @@ module.exports = {
       if (habit.habit_type === "normal") habit.summary_data = this.normalHabitStreaks(habit);
       if (habit.habit_type === "number") habit.summary_data = this.numberHabitSummary(habit);
       if (habit.habit_type === "rating") habit.summary_data = this.ratingHabitSummary(habit);
+      if (habit.habit_type === "count")  habit.summary_data = this.countHabitSummary(habit);
     });
 
     return habitsRecords;
   },
+
+  // Calculates summary data for haits of type "count"
+  countHabitSummary: function(habit) {
+    console.log(habit);
+  },
   
   // Calculates summary data for habits of type "rating"
   ratingHabitSummary: function(habit) {
-    // console.log(habit.records);
-
-    // Calculate rating average since inception
-    // const inceptionAverage = habit.records.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0) / habit.records.length;
-
-    // Calculate rating average over the last 30 days
-    // const today = new Date();
-    // today.setHours(0, 0, 0, 0);
-    // const thirtyDaysAgoDate = new Date(today - (30 * 1000 * 60 * 60 * 24));
-
-    // const thirtyDaysRecords = habit.records.filter(record => new Date(record.date_completed) >= thirtyDaysAgoDate );
-    // const thirtyDayAverage = thirtyDaysRecords.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0) / thirtyDaysRecords.length;
-
-    // const sevenDaysAgoDate = new Date(today - (7 * 1000 * 60 * 60 * 24));
-    // const sevenDaysRecords = thirtyDaysRecords.filter(record => new Date(record.date_completed) >= sevenDaysAgoDate );
-    // const sevenDayAverage = sevenDaysRecords.reduce((accumulator, currentValue) => accumulator + currentValue.rating, 0) / sevenDaysRecords.length;
-
-    // return { inception_average: inceptionAverage, thirty_day_average: thirtyDayAverage, seven_day_average: sevenDayAverage }
-
-
-    // REFACTORING!!!
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const thirtyDaysAgoDate = new Date(today - (30 * 1000 * 60 * 60 * 24));
