@@ -9,10 +9,14 @@ module.exports = {
     // Attaches record summary data to each habit
     habitsRecords.forEach(habit => {
       // If normal habit, calculate completions this week and current streak
-      if (habit.habit_type === "normal") habit.summary_data = this.normalHabitStreaks(habit);
-      if (habit.habit_type === "number") habit.summary_data = this.numberHabitSummary(habit);
-      if (habit.habit_type === "rating") habit.summary_data = this.ratingHabitSummary(habit);
-      if (habit.habit_type === "count")  habit.summary_data = this.countHabitSummary(habit);
+      if (habit.habit_type === "normal")
+        habit.summary_data = this.normalHabitStreaks(habit);
+      if (habit.habit_type === "number")
+        habit.summary_data = this.numberHabitSummary(habit);
+      if (habit.habit_type === "rating")
+        habit.summary_data = this.ratingHabitSummary(habit);
+      if (habit.habit_type === "count")
+        habit.summary_data = this.countHabitSummary(habit);
     });
 
     return habitsRecords;
@@ -20,15 +24,48 @@ module.exports = {
 
   // Calculates summary data for haits of type "count"
   countHabitSummary: function(habit) {
-    console.log(habit);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const thirtyDaysAgoDate = new Date(today - 30 * 1000 * 60 * 60 * 24);
+    const sevenDaysAgoDate = new Date(today - 7 * 1000 * 60 * 60 * 24);
+
+    let inceptionSum = 0;
+    let thirtyDaySum = 0;
+    let sevenDaySum = 0;
+    let thirtyDayCount = 0;
+    let sevenDayCount = 0;
+
+    habit.records.forEach(record => {
+      inceptionSum += record.count;
+
+      if (new Date(record.date_completed) >= thirtyDaysAgoDate) {
+        thirtyDaySum += record.count;
+        thirtyDayCount++;
+      }
+
+      if (new Date(record.date_completed) >= sevenDaysAgoDate) {
+        sevenDaySum += record.count;
+        sevenDayCount++;
+      }
+    });
+
+    const inceptionAverage = inceptionSum / habit.records.length;
+    const thirtyDayAverage = thirtyDaySum / thirtyDayCount;
+    const sevenDayAverage = sevenDaySum / sevenDayCount;
+
+    return {
+      inception_average: inceptionAverage,
+      thirty_day_average: thirtyDayAverage,
+      seven_day_average: sevenDayAverage
+    };
   },
-  
+
   // Calculates summary data for habits of type "rating"
   ratingHabitSummary: function(habit) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    const thirtyDaysAgoDate = new Date(today - (30 * 1000 * 60 * 60 * 24));
-    const sevenDaysAgoDate = new Date(today - (7 * 1000 * 60 * 60 * 24));
+    const thirtyDaysAgoDate = new Date(today - 30 * 1000 * 60 * 60 * 24);
+    const sevenDaysAgoDate = new Date(today - 7 * 1000 * 60 * 60 * 24);
 
     let inceptionSum = 0;
     let thirtyDaySum = 0;
@@ -43,23 +80,31 @@ module.exports = {
         thirtyDaySum += record.rating;
         thirtyDayCount++;
       }
-      
+
       if (new Date(record.date_completed) >= sevenDaysAgoDate) {
         sevenDaySum += record.rating;
         sevenDayCount++;
       }
-    })
+    });
 
     const inceptionAverage = inceptionSum / habit.records.length;
     const thirtyDayAverage = thirtyDaySum / thirtyDayCount;
     const sevenDayAverage = sevenDaySum / sevenDayCount;
 
-    return { inception_average: inceptionAverage, thirty_day_average: thirtyDayAverage, seven_day_average: sevenDayAverage }
+    return {
+      inception_average: inceptionAverage,
+      thirty_day_average: thirtyDayAverage,
+      seven_day_average: sevenDayAverage
+    };
   },
 
   // Calculates summary data for habits of type "number"
   numberHabitSummary: function(habit) {
-    const inceptionAverage = habit.records.reduce((accumulator, currentValue) => accumulator + currentValue.number, 0) / habit.records.length;
+    const inceptionAverage =
+      habit.records.reduce(
+        (accumulator, currentValue) => accumulator + currentValue.number,
+        0
+      ) / habit.records.length;
 
     return { inception_average: inceptionAverage };
   },
@@ -83,7 +128,9 @@ module.exports = {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     // Save first day of this week (sunday)
-    const firstDayThisWeek = new Date(today - today.getDay() * (1000 * 60 * 60 * 24));
+    const firstDayThisWeek = new Date(
+      today - today.getDay() * (1000 * 60 * 60 * 24)
+    );
 
     let completedThisWeekCount = 0;
     // Loop over all records. If record date is after sunday, increment count for completions this week
@@ -100,7 +147,7 @@ module.exports = {
 
     let fullStreak = 0;
     let weekCount = 0;
-    
+
     habit.records
       // First sort the records by date
       .sort((a, b) => new Date(a.date_completed) - new Date(b.date_completed))
@@ -111,12 +158,12 @@ module.exports = {
         if (date_completed <= weekEnd) {
           weekCount++;
           fullStreak++;
-        // Else we've hit a date that is in a new week
+          // Else we've hit a date that is in a new week
         } else {
           // WeekCount didn't meet weekly goal, so reset streak to 1
           if (weekCount < habit.days_per_week_goal) {
             fullStreak = 1;
-          // Otherwise we met the weekly goal, so keep incrementing streak
+            // Otherwise we met the weekly goal, so keep incrementing streak
           } else {
             fullStreak++;
           }
@@ -128,7 +175,10 @@ module.exports = {
         }
       });
 
-    return { completions_this_week: completedThisWeekCount, streak: fullStreak};
+    return {
+      completions_this_week: completedThisWeekCount,
+      streak: fullStreak
+    };
   },
 
   add: function(habitData) {
