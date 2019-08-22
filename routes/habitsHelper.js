@@ -146,6 +146,7 @@ module.exports = {
     weekEnd.setDate(weekEnd.getDate() + (6 - date_created.getDay()));
 
     let fullStreak = 0;
+    let longestStreak = 0;
     let weekCount = 0;
 
     habit.records
@@ -162,6 +163,7 @@ module.exports = {
         } else {
           // WeekCount didn't meet weekly goal, so reset streak to 1
           if (weekCount < habit.days_per_week_goal) {
+            if (fullStreak > longestStreak) longestStreak = fullStreak;
             fullStreak = 1;
             // Otherwise we met the weekly goal, so keep incrementing streak
           } else {
@@ -177,6 +179,7 @@ module.exports = {
 
     return {
       completions_this_week: completedThisWeekCount,
+      longest_streak: longestStreak,
       streak: fullStreak
     };
   },
